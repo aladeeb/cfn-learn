@@ -1,5 +1,8 @@
 ---
 AWSTemplateFormatVersion: 2010-09-09
+Description: > 
+    This is a practical lab on Udacity's nanodegree program.
+    Trying to acheive the challenge on my own.
 
 Parameters: 
   VPCID: 
