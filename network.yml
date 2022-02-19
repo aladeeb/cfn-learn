@@ -1,6 +1,7 @@
 ---
 AWSTemplateFormatVersion: 2010-09-09
 Description: > 
+    This is the network cfn template
     This is a practical lab on Udacity's nanodegree program.
     Trying to acheive the challenge on my own.
 
@@ -12,20 +13,7 @@ Parameters:
   MyAZ: 
     Description: Availability zone
     Type: String
-    Default: us-east-1
-  EC2InstanceType: 
-    Description: Type of the EC2 instance
-    Type: String
-    Default: t2.micro
-  AMIID: 
-    Type: String
-    Default: ami-0f7691f59fd7c47af
-    Description: AMI ID for the EC2 instance
-  EC2KeyName: 
-    Description: EC2 key name
-    Type: String
-    Default: EC2UsingCFNLab
-
+    Default: us-east-1a
 Resources: 
   MyVPC:
     Type: AWS::EC2::VPC
@@ -54,10 +42,10 @@ Resources:
     Properties:
       VpcId: !Ref MyVPC
       InternetGatewayId: !Ref MyIGW
-  MyInstanceSecurityGroup: 
+  MyIPSSHSecurityGroup: 
     Type: AWS::EC2::SecurityGroup
     Properties: 
-      GroupName: MyInstanceSecurityGroup
+      GroupName: MyIPSSHSecurityGroup
       GroupDescription: desc of the SecurityGroup
       VpcId: !Ref MyVPC
       SecurityGroupIngress:
@@ -80,18 +68,31 @@ Resources:
       - CidrIp: 127.0.0.1/32
         IpProtocol: "-1"
       VpcId: !Ref MyVPC
-  MyEC2Instance: 
-    KeyName: !Ref EC2KeyName
-    Type: AWS::EC2::Instance
-    Properties: 
-      AvailabilityZone: !Ref MyAZ
-      InstanceType: !Ref EC2InstanceType
-      ImageId: !Ref AMIID
-      SecurityGroupIds: 
-        - !Ref ExecludeDefaultSG
-        - !Ref MyInstanceSecurityGroup
-      Tags: 
-        - Key: Project
-          Value: UdacityND Lab
-
+Outputs:
+  MyIPSSHSecurityGroup:
+    Description: ssh security group for only my ip
+    Value: !Ref MyIPSSHSecurityGroup
+    Export: 
+      Name: sg-myip-ssh
+  ExecludeDefaultSG:
+    Description: execlute the default security group
+    Value: !Ref ExecludeDefaultSG
+    Export: 
+      Name: sg-execlude-default
 ...
+  # MyEC2Instance: 
+    # KeyName: !Ref EC2KeyName
+    # Type: AWS::EC2::Instance
+    # Properties: 
+    #   AvailabilityZone: !Ref MyAZ
+    #   InstanceType: !Ref EC2InstanceType
+    #   ImageId: !Ref AMIID
+    #   SecurityGroupIds: 
+    #     - !Ref ExecludeDefaultSG
+    #     - !Ref MyInstanceSecurityGroup
+    #   Tags: 
+    #     - Key: Project
+    #       Value: UdacityND Lab
+
+# aws cloudformation create-stack --template-body=file://network.yml --stack-name=network
+# aws cloudformation update-stack --template-body=file://network.yml --stack-name=network

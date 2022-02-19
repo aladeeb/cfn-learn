@@ -1,0 +1,37 @@
+---
+AWSTemplateFormatVersion: 2010-09-09
+Description: > 
+    This is the server cfn template
+    This is a practical lab on Udacity's nanodegree program.
+    Trying to acheive the challenge on my own.
+
+Parameters: 
+  EC2InstanceType: 
+    Description: Type of the EC2 instance
+    Type: String
+    Default: t2.micro
+  AMIID: 
+    Type: String
+    Default: ami-0f7691f59fd7c47af
+    Description: AMI ID for the EC2 instance
+  EC2KeyName: 
+    Description: EC2 key name
+    Type: String
+    Default: EC2UsingCFNLab
+
+Resources: 
+  MyEC2Instance: 
+    KeyName: !Ref EC2KeyName
+    Type: AWS::EC2::Instance
+    Properties: 
+      AvailabilityZone: !Select [0, !GetAZs '']
+      InstanceType: !Ref EC2InstanceType
+      ImageId: !Ref AMIID
+      SecurityGroupIds: 
+        - !Ref ExecludeDefaultSG
+        - !Ref MyInstanceSecurityGroup
+      Tags: 
+        - Key: Project
+          Value: UdacityND Lab
+
+...
