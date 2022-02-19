@@ -5,22 +5,14 @@ Description: >
     Trying to acheive the challenge on my own.
 
 Parameters: 
-  VPCID: 
+  MyIP:
+    Description: My personal IP
     Type: String
-    Default: vpc-0a90323d9bba36a8a
-    Description: VPC ID
-  SubnetAID: 
+    Default: 156.193.33.86/32
+  MyAZ: 
+    Description: Availability zone
     Type: String
-    Default: subnet-0555a884639971edf
-    Description: Subnet ID for zone a
-  SubnetBID: 
-    Type: String
-    Default: subnet-00b276c427d2d5e36
-    Description: Subnet ID for zone b
-  SubnetCID: 
-    Type: String
-    Default: subnet-0797b3e3b6f5e381b
-    Description: Subnet ID for zone c
+    Default: us-east-1
   EC2InstanceType: 
     Description: Type of the EC2 instance
     Type: String
@@ -32,26 +24,74 @@ Parameters:
   EC2KeyName: 
     Description: EC2 key name
     Type: String
-    Default: EC2UsingCFN
+    Default: EC2UsingCFNLab
 
 Resources: 
+  MyVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      Tags:
+        - Key: Name
+          Value: MyVPCUdacityNDLap
+  PubSubnetA:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: !Ref MyAZ
+      VpcId: !Ref MyVPC
+      CidrBlock: 10.0.0.0/24
+      Tags:
+        - Key: Name
+          Value: PubSubnetA
+  MyIGW:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: IGWUdacityLab
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref MyVPC
+      InternetGatewayId: !Ref MyIGW
   MyInstanceSecurityGroup: 
     Type: AWS::EC2::SecurityGroup
     Properties: 
       GroupName: MyInstanceSecurityGroup
       GroupDescription: desc of the SecurityGroup
-      VpcId: 
+      VpcId: !Ref MyVPC
+      SecurityGroupIngress:
+        - CidrIp: !Ref MyIP
+          IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          Description: Allowing only my IP address
+      SecurityGroupEgress:
+        - CidrIp: !Ref MyIP
+          IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          Description: Allowing only my IP address
+  ExecludeDefaultSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Limits security group egress traffic
+      SecurityGroupEgress:
+      - CidrIp: 127.0.0.1/32
+        IpProtocol: "-1"
+      VpcId: !Ref MyVPC
   MyEC2Instance: 
     KeyName: !Ref EC2KeyName
     Type: AWS::EC2::Instance
     Properties: 
+      AvailabilityZone: !Ref MyAZ
       InstanceType: !Ref EC2InstanceType
       ImageId: !Ref AMIID
-      SecurityGroupIds: !Ref MyInstanceSecurityGroup
+      SecurityGroupIds: 
+        - !Ref ExecludeDefaultSG
+        - !Ref MyInstanceSecurityGroup
       Tags: 
         - Key: Project
-          Value: UdacityND
-
-
+          Value: UdacityND Lab
 
 ...
