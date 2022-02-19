@@ -1,0 +1,53 @@
+---
+
+Parameters: 
+  VPCID: 
+    Type: String
+    Default: vpc-0a90323d9bba36a8a
+    Description: VPC ID
+  SubnetAID: 
+    Type: String
+    Default: subnet-0555a884639971edf
+    Description: Subnet ID for zone a
+  SubnetBID: 
+    Type: String
+    Default: subnet-00b276c427d2d5e36
+    Description: Subnet ID for zone b
+  SubnetCID: 
+    Type: String
+    Default: subnet-0797b3e3b6f5e381b
+    Description: Subnet ID for zone c
+  EC2InstanceType: 
+    Description: Type of the EC2 instance
+    Type: String
+    Default: t2.micro
+  AMIID: 
+    Type: String
+    Default: ami-0f7691f59fd7c47af
+    Description: AMI ID for the EC2 instance
+  EC2KeyName: 
+    Description: EC2 key name
+    Type: String
+    Default: EC2UsingCFN
+
+Resources: 
+  MyInstanceSecurityGroup: 
+    Type: AWS::EC2::SecurityGroup
+    Properties: 
+      GroupName: MyInstanceSecurityGroup
+      GroupDescription: desc of the SecurityGroup
+      VpcId: 
+  MyEC2Instance: 
+    KeyName: !Ref EC2KeyName
+    Type: AWS::EC2::Instance
+    Properties: 
+      InstanceType: !Ref EC2InstanceType
+      ImageId: !Ref AMIID
+      SecurityGroupIds: !Ref MyInstanceSecurityGroup
+      Tags: 
+        - Key: Project
+          Value: UdacityND
+
+
+
+...
