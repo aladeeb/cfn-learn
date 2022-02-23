@@ -24,9 +24,9 @@ Parameters:
     Default: us-east-1a
 Resources: 
   MyEC2Instance: 
-    KeyName: !Ref EC2KeyName
     Type: AWS::EC2::Instance
     Properties: 
+      KeyName: !Ref EC2KeyName
       AvailabilityZone: !Ref MyAZ
       InstanceType: !Ref EC2InstanceType
       ImageId: !Ref AMIID
