@@ -6,10 +6,6 @@ Description: >
     Trying to acheive the challenge on my own.
 
 Parameters: 
-  MyIP:
-    Description: My personal IP
-    Type: String
-    Default: 156.193.33.86/32
   MyAZ: 
     Description: Availability zone
     Type: String
@@ -42,32 +38,6 @@ Resources:
     Properties:
       VpcId: !Ref MyVPC
       InternetGatewayId: !Ref MyIGW
-  MyIPSSHSecurityGroup: 
-    Type: AWS::EC2::SecurityGroup
-    Properties: 
-      GroupName: MyIPSSHSecurityGroup
-      GroupDescription: desc of the SecurityGroup
-      VpcId: !Ref MyVPC
-      SecurityGroupIngress:
-        - CidrIp: !Ref MyIP
-          IpProtocol: tcp
-          FromPort: 22
-          ToPort: 22
-          Description: Allowing only my IP address
-      SecurityGroupEgress:
-        - CidrIp: !Ref MyIP
-          IpProtocol: tcp
-          FromPort: 22
-          ToPort: 22
-          Description: Allowing only my IP address
-  ExecludeDefaultSG:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: Limits security group egress traffic
-      SecurityGroupEgress:
-      - CidrIp: 127.0.0.1/32
-        IpProtocol: "-1"
-      VpcId: !Ref MyVPC
   WebServerSG:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -79,39 +49,26 @@ Resources:
           FromPort: 80
           ToPort: 80
           CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          FromPort: -1
+          ToPort: -1
+          CidrIp: 0.0.0.0/0
       Tags:
         - Key: Name
           Value: Web Server SG
 Outputs:
-  MyIPSSHSecurityGroup:
-    Description: ssh security group for only my ip
-    Value: !Ref MyIPSSHSecurityGroup
-    Export: 
-      Name: sg-myip-ssh
-  ExecludeDefaultSG:
-    Description: execlute the default security group
-    Value: !Ref ExecludeDefaultSG
-    Export: 
-      Name: sg-execlude-default
   WebServerSG:
     Description: execlute the default security group
-    Value: !Ref WebServerSG
+    Value: !GetAtt WebServerSG.GroupId
     Export: 
       Name: sg-webserver
+  PubSubnetA:
+    Description: Public subnet id
+    Value: !Ref PubSubnetA
+    Export: 
+      Name: mypubsubnet-id
 ...
-  # MyEC2Instance: 
-    # KeyName: !Ref EC2KeyName
-    # Type: AWS::EC2::Instance
-    # Properties: 
-    #   AvailabilityZone: !Ref MyAZ
-    #   InstanceType: !Ref EC2InstanceType
-    #   ImageId: !Ref AMIID
-    #   SecurityGroupIds: 
-    #     - !Ref ExecludeDefaultSG
-    #     - !Ref MyInstanceSecurityGroup
-    #   Tags: 
-    #     - Key: Project
-    #       Value: UdacityND Lab
 
 # aws cloudformation create-stack --template-body=file://network.yml --stack-name=network
 # aws cloudformation update-stack --template-body=file://network.yml --stack-name=network
