@@ -9,7 +9,7 @@ Parameters:
   EC2InstanceType: 
     Description: Type of the EC2 instance
     Type: String
-    Default: t2.micro
+    Default: t3.micro
   AMIID: 
     Type: String
     Default: ami-0f7691f59fd7c47af
@@ -18,20 +18,38 @@ Parameters:
     Description: EC2 key name
     Type: String
     Default: EC2UsingCFNLab
-
+  MyAZ: 
+    Description: Availability zone
+    Type: String
+    Default: us-east-1a
 Resources: 
   MyEC2Instance: 
     KeyName: !Ref EC2KeyName
     Type: AWS::EC2::Instance
     Properties: 
-      AvailabilityZone: !Select [0, !GetAZs '']
+      AvailabilityZone: !Ref MyAZ
       InstanceType: !Ref EC2InstanceType
       ImageId: !Ref AMIID
+      NetworkInterfaces: 
+        - AssociatePublicIpAddress: True
+          DeviceIndex: 0
       SecurityGroupIds: 
-        - !Ref ExecludeDefaultSG
-        - !Ref MyInstanceSecurityGroup
+        - !ImportValue sg-execlude-default
+        - !ImportValue sg-webserver
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          sudo yum update -y
+          sudo yum install -y httpd
+          sudo systemctl start httpd
+          sudo systemctl enable httpd
       Tags: 
         - Key: Project
           Value: UdacityND Lab
 
+
+
 ...
+
+# aws cloudformation create-stack --template-body=file://server.yml --stack-name=server
+# aws cloudformation update-stack --template-body=file://server.yml --stack-name=server

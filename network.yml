@@ -68,6 +68,20 @@ Resources:
       - CidrIp: 127.0.0.1/32
         IpProtocol: "-1"
       VpcId: !Ref MyVPC
+  WebServerSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: WebServerSG
+      GroupDescription: this the sg that allows inbound traffic
+      VpcId: !Ref MyVPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrId: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: Web Server SG
 Outputs:
   MyIPSSHSecurityGroup:
     Description: ssh security group for only my ip
@@ -79,6 +93,11 @@ Outputs:
     Value: !Ref ExecludeDefaultSG
     Export: 
       Name: sg-execlude-default
+  WebServerSG:
+    Description: execlute the default security group
+    Value: !Ref WebServerSG
+    Export: 
+      Name: sg-webserver
 ...
   # MyEC2Instance: 
     # KeyName: !Ref EC2KeyName
